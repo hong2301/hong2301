@@ -2,7 +2,7 @@
 
 ## 今日日志 (2026-08-17)
 
-今天把微信文章采集器推到了V3.0.1，补全了exe版本信息，顺手清理了README。下午同步了大批订单项目的代码，又给个人主页加了每日提交折线图，折腾了半天渲染问题，总算能自动更新了。
+今天给V3.0.1收尾，补了版本信息，清了README。下午折腾个人主页，从自我介绍一路改到每日开发日志，最后接了DeepSeek自动总结提交，总算能看了。
 
 | 时间 | 仓库 | 提交 |
 |---|---|---|
@@ -12,68 +12,13 @@
 | 16:24:20 | wechat-article-collector | merge: develop -> master (V3.0.1 全部更新) |
 | 16:27:28 | wechat-article-collector | docs: README移除证书章节与旧速度补充说明 |
 | 16:55:10 | wechat-article-collector | merge: develop -> master (README清理) |
-| 17:00:58 | enterprise-query-platform | 整理: 结构整洁化 |
-| 17:53:26 | order-social-media-crawler | auto: 代码同步 |
-| 17:53:41 | order-image-annotator | auto: 代码同步 |
-| 17:53:51 | order-image-annotator | auto: 代码同步 |
-| 17:53:53 | order-tiktok-analysis | auto: 代码同步 |
-| 17:53:54 | order-tiktok-analysis | auto: 代码同步 |
-| 17:53:59 | order-social-media-tools | auto: 代码同步 |
-| 17:54:11 | order-social-media-tools | auto: 代码同步 |
-| 17:54:12 | order-bird-report-crawler | auto: 代码同步 |
-| 17:54:15 | order-decimal-binary | auto: 代码同步 |
-| 17:54:24 | order-decimal-binary | auto: 代码同步 |
-| 17:54:25 | order-boss-crawler | auto: 代码同步 |
-| 17:54:27 | order-boss-crawler | auto: 代码同步 |
-| 17:54:29 | order-boss-crawler | auto: 代码同步 |
-| 17:54:32 | order-single-page | auto: 代码同步 |
-| 17:54:44 | order-facebook-posts | auto: 代码同步 |
-| 18:08:18 | order-csv-shuffle | auto: 代码同步 |
-| 18:08:49 | order-product-name-gen | auto: 代码同步 |
-| 18:09:01 | order-jd-data-tools | auto: 代码同步 |
-| 18:09:13 | order-product-review-analysis | auto: 代码同步 |
-| 18:11:31 | order-diabetes-weather | auto: 代码同步 |
-| 18:16:41 | order-excel-data-process | auto: 代码同步 |
-| 18:17:04 | order-wxdown-service | auto: 代码同步 |
-| 18:17:24 | order-csv-processor | auto: 代码同步 |
-| 18:17:36 | order-wechat-article-tools | auto: 代码同步 |
-| 18:17:56 | order-squirrel-gallery | auto: 代码同步 |
-| 18:18:11 | order-word-frequency-analysis | auto: 代码同步 |
 | 18:29:03 | takeout | auto: 代码同步 |
-| 18:30:36 | order-product-data-tools | auto: 代码同步 |
-| 18:31:25 | order-air-quality-prediction | auto: 代码同步 |
-| 18:32:02 | order-mazu-temple-photos | auto: 代码同步 |
-| 18:32:55 | order-csv-merge | auto: 代码同步 |
-| 18:33:19 | order-appliance-control | auto: 代码同步 |
-| 18:33:35 | order-xiaohongshu-crawler | auto: 代码同步 |
-| 18:33:52 | order-link-collector | auto: 代码同步 |
-| 18:34:03 | order-audio-transcribe | auto: 代码同步 |
-| 18:41:12 | order-cover-collection | auto: 代码同步 |
-| 18:41:26 | order-danmaku-comment | auto: 代码同步 |
-| 18:41:40 | order-comment-db | auto: 代码同步 |
-| 18:41:51 | order-pdd-review-scraper | auto: 代码同步 |
-| 18:42:03 | order-food-sentiment | auto: 代码同步 |
-| 18:42:56 | order-excel-link-extractor | auto: 代码同步 |
-| 18:43:11 | order-date-interpolate | auto: 代码同步 |
-| 18:43:23 | order-blog-lab-reports | auto: 代码同步 |
-| 18:43:38 | order-ml-lab-reports | auto: 代码同步 |
-| 18:43:49 | order-amap-poi-fetch | auto: 代码同步 |
 | 18:44:07 | lyric-collector | auto: 代码同步 |
-| 18:44:12 | order-review-generator | auto: 代码同步 |
-| 18:50:57 | order-baidu-hot-teleplay | auto: 代码同步 |
-| 18:52:06 | order-comment-sentiment | auto: 代码同步 |
-| 18:52:41 | order-shipping-route | auto: 代码同步 |
-| 18:53:03 | order-card-scraper | auto: 代码同步 |
 | 18:53:06 | hong2301 | 个人主页: 自我介绍 + 统计卡 + 项目展示 |
-| 18:53:40 | order-xhs-video-transcriber | auto: 代码同步 |
-| 18:54:02 | order-bilibili-analysis | auto: 代码同步 |
-| 19:02:13 | order-pdf-url-tool | auto: 代码同步 |
-| 19:03:32 | order-car-data-analysis | auto: 代码同步 |
-| 19:03:45 | order-weibo-job-analysis | auto: 代码同步 |
-| 19:04:19 | order-web-tool | auto: 代码同步 |
 | 19:05:35 | hong2301 | 测试: 最简版README(排查渲染) |
 | 19:06:20 | hong2301 | 加回技术栈徽章(无HTML/统计卡) |
 | 19:13:05 | hong2301 | 全新个人主页: 有趣中文版 + 每日提交动态图 |
 | 19:16:44 | hong2301 | 个人主页: 每日提交折线图(自动更新) + Actions流水线 |
+| 19:32:21 | hong2301 | 个人主页改为每日开发日志: AI总结今日提交+表格+历史存档(DeepSeek+Actions) |
 
 📚 [查看历史日志](./logs/)
