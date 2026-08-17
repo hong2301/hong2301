@@ -201,6 +201,8 @@ def build_log(date_str, commits, ai_text, hexc):
     else:
         lines.append("*(今天没有提交记录)*" if not commits else "*日志生成中...*")
     lines.append("")
+    lines.append("---")
+    lines.append("")
     lines.append('<div align="center">'
                  '<img src="wordcloud.png" width="49%%" style="vertical-align:middle" alt="提交词云"/> &nbsp; '
                  '<img src="pie.svg" width="32.7%%" style="vertical-align:middle" alt="提交时间分布"/>'
