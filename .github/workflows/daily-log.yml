@@ -1,0 +1,25 @@
+name: Daily Dev Log
+on:
+  schedule:
+    - cron: "50 15 * * *"        # 每天 UTC 15:50 = 北京时间 23:50 生成当日日志
+  workflow_dispatch:             # 可手动触发
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: 生成每日开发日志(AI总结+提交表格+存档)
+        run: python .github/scripts/gen_log.py
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DEEPSEEK_TOKEN: ${{ secrets.DEEPSEEK_TOKEN }}
+      - name: 提交日志
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "chore: 每日开发日志 [skip ci]"
+          file_pattern: README.md logs/*
