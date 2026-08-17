@@ -167,20 +167,20 @@ def build_pie_svg(commits, hexc, W=420, H=350):
                  ('<g>' + "".join(
                      '<path d="%s" fill="%s"/>' % (d, colors[i])
                      for i, d in enumerate(all_d) if buckets[i] > 0) + '</g>'))
-    # 时钟刻度 12/3/6/9 (外圈任意色, 亮色)
-    lab = "#f0f6fc"
+    # 文字统一用与日志正文一致的亮色 #e6edf3, 加大字号+加粗
+    txt_color = "#e6edf3"
     for ang, label in ((-90, "12"), (0, "3"), (90, "6"), (180, "9")):
         lx, ly = _polar(cx, cy, r + H * 0.06, ang)
-        s.append('<text x="%.1f" y="%.1f" fill="%s" font-size="13" font-weight="bold" '
+        s.append('<text x="%.1f" y="%.1f" fill="%s" font-size="17" font-weight="bold" '
                  'text-anchor="middle" font-family="sans-serif">%s</text>'
-                 % (lx, ly + 4, lab, label))
-    # 中心数字(亮色)
-    s.append('<text x="%.1f" y="%d" fill="%s" font-size="24" font-weight="bold" '
+                 % (lx, ly + 6, txt_color, label))
+    # 中心数字
+    s.append('<text x="%.1f" y="%d" fill="%s" font-size="34" font-weight="bold" '
              'text-anchor="middle" font-family="sans-serif">%d</text>'
-             % (cx, int(cy - 4), "#e6edf3", total))
-    s.append('<text x="%.1f" y="%d" fill="%s" font-size="11" font-weight="bold" '
+             % (cx, int(cy - 2), txt_color, total))
+    s.append('<text x="%.1f" y="%d" fill="%s" font-size="14" font-weight="bold" '
              'text-anchor="middle" font-family="sans-serif">次提交</text>'
-             % (cx, int(cy + 16), "#dde3ea"))
+             % (cx, int(cy + 20), txt_color))
     s.append('</svg>')
     return "".join(s)
 
