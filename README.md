@@ -1,26 +1,25 @@
-# 👋 Hi, I'm hong (honononong)
+# 👋 你好，我是 hong (honononong)
 
-自动化采集工具开发者 · Python / Windows 桌面自动化 / OCR
+白天搬砖，晚上写码。用 Python 干一些"自动化偷懒"的事。
 
-## 🧰 技术栈
+## 📈 我最近的提交动态（每日）
 
-![Python](https://img.shields.io/badge/Python-3776AB?style=flat&logo=python&logoColor=white)
-![Tkinter](https://img.shields.io/badge/Tkinter-GUI-4B8BBE?style=flat)
-![PyQt5](https://img.shields.io/badge/PyQt5-Desktop-41CD52?style=flat)
-![OCR](https://img.shields.io/badge/OCR-RapidOCR-FF6C37?style=flat)
-![Git](https://img.shields.io/badge/Git-版本管理-F05032?style=flat&logo=git&logoColor=white)
+![每日提交](https://ghchart.rshah.org/hong2301)
 
-## 🚀 项目
+> 格子越绿说明那天越勤劳（至少 GitHub 是这么认为的）。
 
-### 📱 微信公众号OCR采集器
-自动操作微信 PC 版，批量采集公众号文章、互动数据与评论区（原创/IP属地识别，CSV+HTML 输出）
+## 🧩 最近在鼓捣
 
-### 🏢 企业查询平台
-广东建筑市场监管公共服务平台企业数据抓取，CLI / GUI 双模式
+- 📱 **微信公众号OCR采集器** —— 让微信自己打工，文章+评论全自动
+- 🏢 **企业查询平台** —— 点几下扒光企业信息
+- ⚡ **能源局许可查询器** —— 电力资质一键查
 
-### ⚡ 能源局许可查询器
-电力业务许可批量查询，关键词检索合并去重
+## ☕ 关于我
+
+- 人生信条：**能自动化的，绝不动手**
+- 唯一运动：Ctrl+C / Ctrl+V
+- 名言：这破事让我写个脚本 5 分钟搞定
 
 ---
 
-⭐ 如果我的项目对你有帮助，欢迎 Star
+⭐ 觉得有意思就点个 Star，给我点继续偷懒的动力
