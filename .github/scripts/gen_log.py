@@ -145,8 +145,7 @@ def build_pie_svg(commits, hexc, W=420, H=350):
     cx, cy, r, r2 = W / 2, H / 2, H * 0.30, H * 0.155
     colors = shades(hexc, 6)
     s = ['<svg xmlns="http://www.w3.org/2000/svg" width="%d" height="%d" viewBox="0 0 %d %d">'
-         % (W, H, W, H),
-         '<style>.pt{fill:#1f2328;} @media (prefers-color-scheme:dark){.pt{fill:#e6edf3;}}</style>']
+         % (W, H, W, H)]
     # 环形扇区(evenodd 挖空内圆) - 用单个复合path
     all_d = []
     start = -90
@@ -171,19 +170,19 @@ def build_pie_svg(commits, hexc, W=420, H=350):
                  ('<g>' + "".join(
                      '<path d="%s" fill="%s"/>' % (d, colors[i])
                      for i, d in enumerate(all_d) if buckets[i] > 0) + '</g>'))
-    # 文字随主题自适应(深色浅字/浅色深字), 加大字号+加粗
+    # 文字直接用主题色
     for ang, label in ((-90, "12"), (0, "3"), (90, "6"), (180, "9")):
         lx, ly = _polar(cx, cy, r + H * 0.06, ang)
-        s.append('<text class="pt" x="%.1f" y="%.1f" font-size="17" font-weight="bold" '
+        s.append('<text x="%.1f" y="%.1f" fill="%s" font-size="17" font-weight="bold" '
                  'text-anchor="middle" font-family="sans-serif">%s</text>'
-                 % (lx, ly + 6, label))
+                 % (lx, ly + 6, hexc, label))
     # 中心数字
-    s.append('<text class="pt" x="%.1f" y="%d" font-size="34" font-weight="bold" '
+    s.append('<text x="%.1f" y="%d" fill="%s" font-size="34" font-weight="bold" '
              'text-anchor="middle" font-family="sans-serif">%d</text>'
-             % (cx, int(cy - 2), total))
-    s.append('<text class="pt" x="%.1f" y="%d" font-size="14" font-weight="bold" '
+             % (cx, int(cy - 2), hexc, total))
+    s.append('<text x="%.1f" y="%d" fill="%s" font-size="14" font-weight="bold" '
              'text-anchor="middle" font-family="sans-serif">次提交</text>'
-             % (cx, int(cy + 20)))
+             % (cx, int(cy + 20), hexc))
     s.append('</svg>')
     return "".join(s)
 
