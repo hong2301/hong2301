@@ -13,13 +13,19 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - name: 生成每日开发日志(AI总结+提交表格+存档)
+      - name: 安装依赖(词云+中文分词)与中文字体
+        run: |
+          pip install wordcloud jieba
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq fonts-wqy-microhei
+      - name: 生成每日开发日志(AI总结+词云+时间饼图+存档)
         run: python .github/scripts/gen_log.py
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DEEPSEEK_TOKEN: ${{ secrets.DEEPSEEK_TOKEN }}
+          FONT_PATH: /usr/share/fonts/truetype/wqy/wqy-microhei.ttc
       - name: 提交日志
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "chore: 每日开发日志 [skip ci]"
-          file_pattern: README.md logs/*
+          file_pattern: README.md logs/* wordcloud.png pie.svg
