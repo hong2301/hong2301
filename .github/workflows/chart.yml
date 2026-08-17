@@ -1,0 +1,24 @@
+name: Update Commit Chart
+on:
+  schedule:
+    - cron: "0 2 * * *"        # 每天 UTC 02:00 更新
+  workflow_dispatch:           # 可手动触发
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: 生成提交折线图
+        run: python .github/scripts/gen_chart.py
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: 提交图表
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "chore: 更新每日提交折线图 [skip ci]"
+          file_pattern: chart.svg
