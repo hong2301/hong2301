@@ -1,7 +1,7 @@
 name: Daily Dev Log
 on:
   schedule:
-    - cron: "50 15 * * *"        # 每天 UTC 15:50 = 北京时间 23:50 生成当日日志
+    - cron: "0 16 * * *"         # 每天 UTC 16:00 = 北京时间 0 点, 生成昨天(完整一天)的日志
   workflow_dispatch:             # 可手动触发
 permissions:
   contents: write

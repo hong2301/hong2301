@@ -1,6 +1,6 @@
 # 每日开发日志v6: 词云PIL透明 + 饼图SVG矢量透明 + 12/3/6/9刻度 + AI 30-500字
 import json, math, os, re, urllib.request, colorsys
-from datetime import date, datetime
+from datetime import date, datetime, timezone, timedelta
 
 GH_TOKEN = os.environ.get("GH_TOKEN", "")
 DS_TOKEN = os.environ.get("DEEPSEEK_TOKEN", "")
@@ -28,7 +28,7 @@ def gh_api(url):
         return json.load(r)
 
 
-def ds_ai(text, max_tokens=800):
+def ds_ai(text, max_tokens=2000):
     body = json.dumps({"model": "deepseek-v4-flash",
         "messages": [{"role": "user", "content": text}],
         "stream": False, "max_tokens": max_tokens}).encode()
@@ -39,12 +39,23 @@ def ds_ai(text, max_tokens=800):
         return json.load(r)["choices"][0]["message"]["content"]
 
 
+def bj_yesterday_utc_range():
+    """返回(昨天北京全天)的 (since_utc, until_utc)"""
+    bj = timezone(timedelta(hours=8))
+    now = datetime.now(bj)
+    y = (now - timedelta(days=1)).replace(hour=0, minute=0, second=0, microsecond=0)
+    since_utc = y.astimezone(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    until_utc = (y + timedelta(days=1)).astimezone(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    return since_utc, until_utc
+
+
 def today_commits():
-    since = datetime.utcnow().strftime("%Y-%m-%dT00:00:00Z")
+    since, until = bj_yesterday_utc_range()
     commits, page = [], 1
     while True:
         url = ("https://api.github.com/search/commits?q=author:" + AUTHOR +
-               "+committer-date:>=" + since + "&per_page=100&page=" + str(page))
+               "+committer-date:>=" + since + "+committer-date:<" + until +
+               "&per_page=100&page=" + str(page))
         items = gh_api(url).get("items", [])
         for it in items:
             c = it["commit"]
@@ -61,7 +72,7 @@ def today_commits():
 def ai_log_and_color(commits):
     desc = chr(10).join("- " + c["time"] + " [" + REPO_NAMES.get(c["repo"], c["repo"]) + "] " + c["msg"] for c in commits)
     prompt = (
-        "以下是我今天(GitHub: hong2301)的所有代码提交记录:" + chr(10) + desc +
+        "以下是我今天(GitHub: hong2301)的全部代码提交记录(共%d条):" % len(commits) + chr(10) + desc +
         chr(10) + chr(10) + "请完成两件事:" + chr(10) +
         "1. 写一篇30-500字的中文今日开发日志, 第一人称, 像程序员日记, "
         "根据今天内容多少灵活调整篇幅, 内容少就短一点, 千万不要写废话. "
@@ -218,7 +229,8 @@ def build_log(date_str, commits, ai_text, hexc):
 
 if __name__ == "__main__":
     root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-    today = date.today().isoformat()
+    bj = timezone(timedelta(hours=8))
+    today = (datetime.now(bj) - timedelta(days=1)).date().isoformat()   # 昨天(北京)
     commits = today_commits()
     ai_text, color_name = None, "blue"
     if commits and DS_TOKEN:
