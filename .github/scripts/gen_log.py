@@ -7,6 +7,12 @@ DS_TOKEN = os.environ.get("DEEPSEEK_TOKEN", "")
 AUTHOR = os.environ.get("GH_AUTHOR", "hong2301")
 FONT = os.environ.get("FONT_PATH", "")
 
+REPO_NAMES = {
+    "wechat-article-collector": "微信公众号OCR采集器",
+    "enterprise-query-platform": "企业查询平台",
+    "nea_license_query": "能源局许可查询器",
+}
+
 # 低饱和易读色板(AI 从中选)
 PALETTE = {
     "blue":   "#58a6ff",
@@ -68,7 +74,7 @@ def today_commits():
 
 def ai_log_and_color(commits):
     """AI 生成日志文本 + 判断主题色(返回 (text, color_name))"""
-    desc = "\n".join("- " + c["time"] + " [" + c["repo"] + "] " + c["msg"] for c in commits)
+    desc = chr(10).join("- " + c["time"] + " [" + REPO_NAMES.get(c["repo"], c["repo"]) + "] " + c["msg"] for c in commits)
     prompt = (
         "以下是我今天(GitHub: hong2301)的所有代码提交记录:\n" + desc +
         "\n\n请完成两件事:\n"
