@@ -128,7 +128,7 @@ def _wordcloud_img(commits, hexc, width, height):
     return Image.fromarray(rgba, "RGBA")
 
 
-def _pie_img(commits, hexc, size=360, bg=(13, 17, 23, 255)):
+def _pie_img(commits, hexc, size=360, bg=(0, 0, 0, 0)):
     """环形时间饼图, 12/3/6/9时钟刻度, 中心数字"""
     from PIL import Image, ImageDraw, ImageFont
     buckets = [0, 0, 0, 0, 0, 0]
@@ -182,15 +182,15 @@ def compose_chart(commits, hexc, out):
     W = H * 4          # 1200
     pie_size = H       # 300 正方形饼图(右侧)
     wc_w = W - pie_size   # 900 词云区域
-    # 深色底
-    canvas = Image.new("RGBA", (W, H), (13, 17, 23, 255))
+    # 透明底
+    canvas = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     # 词云覆盖左侧
     wc = _wordcloud_img(commits, hexc, wc_w, H)
     canvas.alpha_composite(wc, (0, 0))
     # 饼图贴右侧
     pie = _pie_img(commits, hexc, size=pie_size)
     canvas.alpha_composite(pie, (wc_w, 0))
-    canvas.convert("RGB").save(out, "PNG")
+    canvas.save(out, "PNG")
     return W, H
 
 
