@@ -168,7 +168,7 @@ def build_pie_svg(commits, hexc, W=420, H=350):
                      '<path d="%s" fill="%s"/>' % (d, colors[i])
                      for i, d in enumerate(all_d) if buckets[i] > 0) + '</g>'))
     # 时钟刻度 12/3/6/9 (外圈任意色, 亮色)
-    lab = "#c9d1d9"
+    lab = "#f0f6fc"
     for ang, label in ((-90, "12"), (0, "3"), (90, "6"), (180, "9")):
         lx, ly = _polar(cx, cy, r + H * 0.06, ang)
         s.append('<text x="%.1f" y="%.1f" fill="%s" font-size="13" font-weight="bold" '
@@ -178,9 +178,9 @@ def build_pie_svg(commits, hexc, W=420, H=350):
     s.append('<text x="%.1f" y="%d" fill="%s" font-size="24" font-weight="bold" '
              'text-anchor="middle" font-family="sans-serif">%d</text>'
              % (cx, int(cy - 4), "#e6edf3", total))
-    s.append('<text x="%.1f" y="%d" fill="%s" font-size="11" '
+    s.append('<text x="%.1f" y="%d" fill="%s" font-size="11" font-weight="bold" '
              'text-anchor="middle" font-family="sans-serif">次提交</text>'
-             % (cx, int(cy + 16), "#8b949e"))
+             % (cx, int(cy + 16), "#dde3ea"))
     s.append('</svg>')
     return "".join(s)
 
