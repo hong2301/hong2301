@@ -58,7 +58,7 @@ def ai_log_and_color(commits):
     prompt = (
         "以下是我今天(GitHub: hong2301)的所有代码提交记录:\n" + desc +
         "\n\n请完成两件事:\n"
-        "1. 写一篇200-500字的中文今日开发日志, 第一人称, 像程序员日记, "
+        "1. 写一篇30-500字的中文今日开发日志, 跟据今天内容多少灵活调整篇幅, 内容少就短一点, 千万不要写废话, 第一人称, 像程序员日记, "
         "自然叙述今天做了什么、解决了什么问题, 不要列清单, 不要说'今天提交了N次代码'这类废话. "
         "重要: 涉及具体项目/版本号/功能时, 前面必须带项目中文名\n"
         "2. 根据今天的工作内容与状态, 从以下8个主题色中选一个最贴合的颜色:\n"
@@ -121,28 +121,32 @@ def build_pie_svg(commits, hexc):
         hh = int(c["time"][:2])
         buckets[min(hh//4, 5)] = (buckets[min(hh//4,5)][0], buckets[min(hh//4,5)][1]+1)
     total = len(commits) or 1
-    W, H, cx, cy, rmax = 420, 350, 210, 175, 128
-    maxv = max(b[1] for b in buckets) or 1
+    W, H, cx, cy, r, r2 = 430, 360, 215, 180, 108, 58
     colors = shades(hexc, len(buckets))
     s = ['<svg xmlns="http://www.w3.org/2000/svg" width="%d" height="%d" viewBox="0 0 %d %d">' % (W,H,W,H),
          '<rect width="100%%" height="100%%" fill="#0d1117"/>']
     seg = 360.0 / len(buckets)
-    gap = 1.5
+    start = -90
     for i, (name, v) in enumerate(buckets):
-        rr = rmax * (v / maxv)
-        if rr > 2:
-            a0 = -90 + i * seg + gap / 2
-            a1 = -90 + (i + 1) * seg - gap / 2
-            x0, y0 = _polar(cx, cy, rr, a0)
-            x1, y1 = _polar(cx, cy, rr, a1)
-            large = 1 if (a1 - a0) > 180 else 0
-            d = ("M %.1f %.1f L %.1f %.1f A %.1f %.1f 0 %d 1 %.1f %.1f Z"
-                 % (cx, cy, x0, y0, rr, rr, large, x1, y1))
+        frac = v / total
+        a0, a1 = start, start + frac * 360
+        if frac > 0.001:
+            x0,y0 = _polar(cx,cy,r,a0); x1,y1 = _polar(cx,cy,r,a1)
+            x2,y2 = _polar(cx,cy,r2,a1); x3,y3 = _polar(cx,cy,r2,a0)
+            large = 1 if (a1-a0) > 180 else 0
+            d = ("M %.1f %.1f A %d %d 0 %d 1 %.1f %.1f L %.1f %.1f A %d %d 0 %d 0 %.1f %.1f Z"
+                 % (x0,y0,r,r,large,x1,y1,x2,y2,r2,r2,large,x3,y3))
             s.append('<path d="' + d + '" fill="' + colors[i] + '"/>')
-    s.append('<text x="%d" y="%d" fill="#1a1a1a" font-size="34" font-weight="bold" text-anchor="middle" font-family="sans-serif">%d</text>'
+        # 时间刻度: 扇区中央外侧
+        am = (a0 + a1) / 2
+        tx, ty = _polar(cx, cy, r + 20, am)
+        s.append('<text x="%.1f" y="%.1f" fill="#c9d1d9" font-size="12" text-anchor="middle" font-family="sans-serif">%s</text>'
+                 % (tx, ty + 4, name))
+        start = a1
+    s.append('<text x="%d" y="%d" fill="#1a1a1a" font-size="32" font-weight="bold" text-anchor="middle" font-family="sans-serif">%d</text>'
              % (cx, cy+2, total))
-    s.append('<text x="%d" y="%d" fill="#333333" font-size="16" text-anchor="middle" font-family="sans-serif">次提交</text>'
-             % (cx, cy+28))
+    s.append('<text x="%d" y="%d" fill="#4b5563" font-size="15" text-anchor="middle" font-family="sans-serif">次提交</text>'
+             % (cx, cy+24))
     s.append('</svg>')
     return "".join(s)
 
@@ -153,7 +157,9 @@ def build_log(date_str, commits, ai_text, hexc, img_line):
     title = '<h1 style="color:%s">%s日志</h1>' % (hexc, cn_date(date.fromisoformat(date_str)))
     lines = [title, "", ""]
     if ai_text:
-        lines.append("　　" + ai_text.strip())
+        paras = ai_text.strip().split(chr(10))
+        indented = chr(10).join("\u3000\u3000" + p if p.strip() else "" for p in paras)
+        lines.append(indented)
     else:
         lines.append("*(今天没有提交记录)*" if not commits else "*日志生成中...*")
     lines.append("")
