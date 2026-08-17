@@ -137,12 +137,13 @@ def build_pie_svg(commits, hexc):
             d = ("M %.1f %.1f A %d %d 0 %d 1 %.1f %.1f L %.1f %.1f A %d %d 0 %d 0 %.1f %.1f Z"
                  % (x0,y0,r,r,large,x1,y1,x2,y2,r2,r2,large,x3,y3))
             s.append('<path d="' + d + '" fill="' + colors[i] + '"/>')
-        # 时间刻度: 扇区中央外侧
-        am = (a0 + a1) / 2
-        tx, ty = _polar(cx, cy, r + 20, am)
-        s.append('<text x="%.1f" y="%.1f" fill="#c9d1d9" font-size="12" text-anchor="middle" font-family="sans-serif">%s</text>'
-                 % (tx, ty + 4, name))
         start = a1
+    # 时钟刻度 12/3/6/9(外圈)
+    clk = [(-90, "12"), (0, "3"), (90, "6"), (180, "9")]
+    for ang, label in clk:
+        lx, ly = _polar(cx, cy, r + 18, ang)
+        s.append('<text x="%.1f" y="%.1f" fill="#c9d1d9" font-size="15" font-weight="bold" text-anchor="middle" font-family="sans-serif">%s</text>'
+                 % (lx, ly + 5, label))
     s.append('<text x="%d" y="%d" fill="#1a1a1a" font-size="32" font-weight="bold" text-anchor="middle" font-family="sans-serif">%d</text>'
              % (cx, cy+2, total))
     s.append('<text x="%d" y="%d" fill="#4b5563" font-size="15" text-anchor="middle" font-family="sans-serif">次提交</text>'
@@ -180,7 +181,7 @@ if __name__ == "__main__":
         except Exception as e:
             print("AI失败:", e)
     hexc = PALETTE.get(color_name, "#58a6ff")
-    img_now = '<img src="wordcloud.png" width="49%%" alt="提交词云"/> <img src="pie.svg" width="32.7%%" alt="提交时间分布"/>'
+    img_now = '<div align="center"><img src="wordcloud.png" width="49%%" style="vertical-align:middle" alt="提交词云"/> &nbsp; <img src="pie.svg" width="32.7%%" style="vertical-align:middle" alt="提交时间分布"/></div>'
     if commits:
         try:
             build_wordcloud(commits, os.path.join(root, "wordcloud.png"), hexc)
@@ -199,7 +200,7 @@ if __name__ == "__main__":
         wc_a, pie_a = today + "-wordcloud.png", today + "-pie.svg"
         shutil.copy(os.path.join(root, "wordcloud.png"), os.path.join(root, "logs", wc_a))
         shutil.copy(os.path.join(root, "pie.svg"), os.path.join(root, "logs", pie_a))
-        img_arch = '<img src="%s" width="49%%" alt="提交词云"/> <img src="%s" width="32.7%%" alt="提交时间分布"/>' % (wc_a, pie_a)
+        img_arch = '<div align="center"><img src="%s" width="49%%" style="vertical-align:middle" alt="提交词云"/> &nbsp; <img src="%s" width="32.7%%" style="vertical-align:middle" alt="提交时间分布"/></div>' % (wc_a, pie_a)
     else:
         img_arch = img_now
     with open(os.path.join(root, "logs", today + ".md"), "w", encoding="utf-8") as f:
