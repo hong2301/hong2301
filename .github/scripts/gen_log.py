@@ -74,9 +74,11 @@ def ai_log_and_color(commits):
     prompt = (
         "以下是我今天(GitHub: hong2301)的全部代码提交记录(共%d条):" % len(commits) + chr(10) + desc +
         chr(10) + chr(10) + "请完成两件事:" + chr(10) +
-        "1. 写一篇30-500字的中文今日开发日志, 第一人称, 像程序员日记, "
+        "1. 写一篇30-500字的中文今日开发日志, 第一人称, 只客观记录当天做了什么+简评当天, "
         "根据今天内容多少灵活调整篇幅, 内容少就短一点, 千万不要写废话. "
-        "重要: 涉及具体项目/版本号/功能时, 前面必须带项目中文名" + chr(10) +
+        "重要: 涉及具体项目/版本号/功能时, 前面必须带项目中文名. "
+        "严禁: 对未来的任何推测或期望(如'明天要...'、'明天应该...'、'接下来得...'), "
+        "严禁情绪宣泄, 只描述事实与当天评价" + chr(10) +
         "2. 根据今天的工作内容与状态, 从以下8个主题色中选一个最贴合的颜色:" + chr(10) +
         "blue, green, purple, orange, cyan, pink, teal, yellow" + chr(10) +
         "严格只输出JSON: {\"text\": \"日志内容\", \"color\": \"颜色名\"}")
@@ -91,6 +93,19 @@ def ai_log_and_color(commits):
             return str(d.get("text", "")).strip(), color
         except Exception:
             pass
+    # fallback: JSON解析失败时用正则提取 text 字段
+    tm = re.search(r'"text"\s*:\s*"((?:[^"\]|\.)*)"', raw, re.S)
+    if tm:
+        try:
+            return json.loads('"' + tm.group(1) + '"'), "blue"
+        except Exception:
+            pass
+    # 最后兜底: 去掉可能的JSON壳
+    t2 = re.sub(r'^\s*\{.*?"text"\s*:\s*"', "", raw, flags=re.S)
+    t2 = re.sub(r'"\s*,\s*"color".*$', "", t2, flags=re.S)
+    t2 = t2.strip().strip('"').strip()
+    if t2 and len(t2) > 2:
+        return t2, "blue"
     return raw.strip(), "blue"
 
 
