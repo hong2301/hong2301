@@ -1,4 +1,4 @@
-# 每日开发日志v5: 词云+饼图拼接单张(4:1) + 12/3/6/9刻度 + AI总结30-500字
+# 每日开发日志v6: 词云PIL透明 + 饼图SVG矢量透明 + 12/3/6/9刻度 + AI 30-500字
 import json, math, os, re, urllib.request, colorsys
 from datetime import date, datetime
 
@@ -50,7 +50,7 @@ def today_commits():
             c = it["commit"]
             commits.append({"time": (c.get("committer") or {}).get("date", "")[11:19],
                 "repo": ((it.get("repository") or {}).get("full_name", "")).replace("hong2301/", ""),
-                "msg": (c.get("message") or "").split("\n")[0]})
+                "msg": (c.get("message") or "").split(chr(10))[0]})
         if len(items) < 100 or page >= 10:
             break
         page += 1
@@ -98,7 +98,8 @@ def _hex_rgb(hexc):
     return (int(hexc[1:3], 16), int(hexc[3:5], 16), int(hexc[5:7], 16))
 
 
-def _wordcloud_img(commits, hexc, width, height):
+def build_wordcloud(commits, out, hexc, width=630, height=350):
+    """词云: PIL+wordcloud 透明 PNG(高质量)"""
     from PIL import Image
     import numpy as np
     from wordcloud import WordCloud
@@ -117,7 +118,7 @@ def _wordcloud_img(commits, hexc, width, height):
         return int(r * 255), int(g * 255), int(b * 255)
 
     wc = WordCloud(font_path=FONT, width=width, height=height,
-        background_color="white", color_func=cf,
+        background_color="white", color_func=cf, prefer_horizontal=0.9,
         max_words=80, random_state=42, collocations=False).generate(seg)
     arr = np.array(wc.to_image())
     rgba = np.zeros((arr.shape[0], arr.shape[1], 4), dtype=np.uint8)
@@ -125,73 +126,63 @@ def _wordcloud_img(commits, hexc, width, height):
     white = (arr[:, :, 0] > 235) & (arr[:, :, 1] > 235) & (arr[:, :, 2] > 235)
     rgba[white, 3] = 0
     rgba[~white, 3] = 255
-    return Image.fromarray(rgba, "RGBA")
+    Image.fromarray(rgba, "RGBA").save(out, "PNG")
 
 
-def _pie_img(commits, hexc, size=360, bg=(0, 0, 0, 0)):
-    """环形时间饼图, 12/3/6/9时钟刻度, 中心数字"""
-    from PIL import Image, ImageDraw, ImageFont
+def _polar(cx, cy, r, deg):
+    rad = math.radians(deg)
+    return cx + r * math.cos(rad), cy + r * math.sin(rad)
+
+
+def build_pie_svg(commits, hexc, W=420, H=350):
+    """饼图: SVG 矢量透明(环形 evenodd 挖空) + 12/3/6/9 时钟刻度 + 中心数字"""
     buckets = [0, 0, 0, 0, 0, 0]
     for c in commits:
         buckets[min(int(c["time"][:2]) // 4, 5)] += 1
     total = len(commits) or 1
-    img = Image.new("RGBA", (size, size), bg)
-    d = ImageDraw.Draw(img)
-    cx = cy = size / 2
-    r = size * 0.30          # 外环半径
-    r2 = size * 0.155        # 内环半径
+    cx, cy, r, r2 = W / 2, H / 2, H * 0.30, H * 0.155
     colors = shades(hexc, 6)
+    s = ['<svg xmlns="http://www.w3.org/2000/svg" width="%d" height="%d" viewBox="0 0 %d %d">'
+         % (W, H, W, H)]
+    # 环形扇区(evenodd 挖空内圆) - 用单个复合path
+    all_d = []
     start = -90
     for i, v in enumerate(buckets):
         frac = v / total
-        a0 = start
-        a1 = start + frac * 360
+        a0, a1 = start, start + frac * 360
         if frac > 0.001:
-            # 外扇区
-            d.pieslice([cx - r, cy - r, cx + r, cy + r], a0, a1, fill=colors[i])
+            x0, y0 = _polar(cx, cy, r, a0)
+            x1, y1 = _polar(cx, cy, r, a1)
+            x2, y2 = _polar(cx, cy, r2, a1)
+            x3, y3 = _polar(cx, cy, r2, a0)
+            large = 1 if (a1 - a0) > 180 else 0
+            d = ("M %.1f %.1f A %.1f %.1f 0 %d 1 %.1f %.1f "
+                 "A %.1f %.1f 0 %d 0 %.1f %.1f Z"
+                 % (x0, y0, r, r, large, x1, y1, r2, r2, large, x3, y3))
+            all_d.append(d)
         start = a1
-    # 挖内圆
-    d.ellipse([cx - r2, cy - r2, cx + r2, cy + r2], fill=bg)
-    # 中心数字(白色文字, 与日志正文同色系)
-    try:
-        f_big = ImageFont.truetype(FONT, size=int(size * 0.12))
-        f_small = ImageFont.truetype(FONT, size=int(size * 0.055))
-    except Exception:
-        f_big = f_small = None
-    txt = str(total)
-    tw = d.textlength(txt, font=f_big) if f_big else 20
-    d.text((cx - tw / 2, cy - size * 0.075), txt, fill=(230, 237, 243, 255), font=f_big)
-    tw2 = d.textlength("次提交", font=f_small) if f_small else 30
-    d.text((cx - tw2 / 2, cy + size * 0.02), "次提交", fill=(140, 149, 158, 255), font=f_small)
-    # 时钟刻度 12/3/6/9(外圈, 亮色)
-    lab_col = (201, 209, 217, 255)
-    f_lab = f_small
+    if all_d:
+        s.append('<path d="%s" fill-rule="evenodd" fill="%s" fill-opacity="%s"/>'
+                 % (" ".join(all_d), "#555555", "0.0") if False else
+                 ('<g>' + "".join(
+                     '<path d="%s" fill="%s"/>' % (d, colors[i])
+                     for i, d in enumerate(all_d) if buckets[i] > 0) + '</g>'))
+    # 时钟刻度 12/3/6/9 (外圈任意色, 亮色)
+    lab = "#c9d1d9"
     for ang, label in ((-90, "12"), (0, "3"), (90, "6"), (180, "9")):
-        rad = math.radians(ang)
-        lx = cx + (r + size * 0.06) * math.cos(rad)
-        ly = cy + (r + size * 0.06) * math.sin(rad)
-        lw = d.textlength(label, font=f_lab) if f_lab else 10
-        d.text((lx - lw / 2, ly - size * 0.03), label, fill=lab_col, font=f_lab)
-    return img
-
-
-def compose_chart(commits, hexc, out):
-    """拼接单张图 宽:高=4:1, 右侧正方形饼图, 剩余给词云"""
-    from PIL import Image
-    H = 300
-    W = H * 4          # 1200
-    pie_size = H       # 300 正方形饼图(右侧)
-    wc_w = W - pie_size   # 900 词云区域
-    # 透明底
-    canvas = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-    # 词云覆盖左侧
-    wc = _wordcloud_img(commits, hexc, wc_w, H)
-    canvas.alpha_composite(wc, (0, 0))
-    # 饼图贴右侧
-    pie = _pie_img(commits, hexc, size=pie_size)
-    canvas.alpha_composite(pie, (wc_w, 0))
-    canvas.save(out, "PNG")
-    return W, H
+        lx, ly = _polar(cx, cy, r + H * 0.06, ang)
+        s.append('<text x="%.1f" y="%.1f" fill="%s" font-size="13" font-weight="bold" '
+                 'text-anchor="middle" font-family="sans-serif">%s</text>'
+                 % (lx, ly + 4, lab, label))
+    # 中心数字(亮色)
+    s.append('<text x="%.1f" y="%d" fill="%s" font-size="24" font-weight="bold" '
+             'text-anchor="middle" font-family="sans-serif">%d</text>'
+             % (cx, int(cy - 4), "#e6edf3", total))
+    s.append('<text x="%.1f" y="%d" fill="%s" font-size="11" '
+             'text-anchor="middle" font-family="sans-serif">次提交</text>'
+             % (cx, int(cy + 16), "#8b949e"))
+    s.append('</svg>')
+    return "".join(s)
 
 
 def cn_date(d):
@@ -208,7 +199,10 @@ def build_log(date_str, commits, ai_text, hexc):
     else:
         lines.append("*(今天没有提交记录)*" if not commits else "*日志生成中...*")
     lines.append("")
-    lines.append('<div align="center"><img src="chart.png" alt="今日提交词云与时间分布"/></div>')
+    lines.append('<div align="center">'
+                 '<img src="wordcloud.png" width="49%%" style="vertical-align:middle" alt="提交词云"/> &nbsp; '
+                 '<img src="pie.svg" width="32.7%%" style="vertical-align:middle" alt="提交时间分布"/>'
+                 '</div>')
     lines.append("")
     lines.append("📚 [查看历史日志](./logs/)")
     return chr(10).join(lines)
@@ -228,20 +222,25 @@ if __name__ == "__main__":
     hexc = PALETTE.get(color_name, "#58a6ff")
     if commits:
         try:
-            W, H = compose_chart(commits, hexc, os.path.join(root, "chart.png"))
-            print("拼接图OK:", W, "x", H)
+            build_wordcloud(commits, os.path.join(root, "wordcloud.png"), hexc)
+            print("词云OK")
         except Exception as e:
-            print("拼接图失败:", e)
+            print("词云失败:", e)
+        with open(os.path.join(root, "pie.svg"), "w", encoding="utf-8") as f:
+            f.write(build_pie_svg(commits, hexc))
+        print("饼图OK")
     content = build_log(today, commits, ai_text, hexc)
     with open(os.path.join(root, "README.md"), "w", encoding="utf-8") as f:
         f.write(content)
-    # 存档: 按日期文件夹
     day_dir = os.path.join(root, "logs", today)
     os.makedirs(day_dir, exist_ok=True)
-    if commits and os.path.isfile(os.path.join(root, "chart.png")):
+    os.makedirs(day_dir, exist_ok=True)
+    if commits:
         import shutil
-        shutil.copy(os.path.join(root, "chart.png"), os.path.join(day_dir, "chart.png"))
-        arch_lines = content.replace('width="1200"', 'width="100%"')
-        with open(os.path.join(day_dir, "日志.md"), "w", encoding="utf-8") as f:
-            f.write(content.replace('src="chart.png"', 'src="chart.png"'))
+        if os.path.isfile(os.path.join(root, "wordcloud.png")):
+            shutil.copy(os.path.join(root, "wordcloud.png"), os.path.join(day_dir, "wordcloud.png"))
+        if os.path.isfile(os.path.join(root, "pie.svg")):
+            shutil.copy(os.path.join(root, "pie.svg"), os.path.join(day_dir, "pie.svg"))
+    with open(os.path.join(day_dir, "日志.md"), "w", encoding="utf-8") as f:
+        f.write(content)
     print("完成: %d commits, 主题色 %s" % (len(commits), color_name))
