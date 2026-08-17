@@ -1,10 +1,10 @@
-<h1 style="color:#3fb950">2026年8月17日日志</h1>
+<h1 style="color:#bc8cff">2026年8月17日日志</h1>
 
 
-　　今天主要推进了两个项目。先是完成了微信公众号OCR采集器的V3.0.1发布，补全了exe版本信息，并整理了用户向README，加了发布者签名说明，随后合并到master。下午把个人主页重构了一遍，从自我介绍改成每日开发日志，接入了DeepSeek和Actions实现自动更新。晚上连续迭代了很多轮：从提交表格加AI总结，到生成词云和饼图，再到最后拼成一张宽图，期间调了背景透明、时钟刻度、文字颜色自适应、主题色随AI判断变化，最后还把历史存档改成按日期分文件夹存储。另一个仓储群里的二十多个order项目也做了同步提交。整体偏工具链打磨，虽然琐碎，但自动化流程跑通后应该能省不少事。
+　　今天上午主要在维护每日开发日志，下午集中完成微信公众号OCR采集器V3.0.1的发布，包括README完善、版本信息添加与分支合并。随后花了整个晚上重构个人主页，从最初简单介绍逐步演变为每日开发日志系统：添加了AI总结、词云与环形饼图，反复调整图表比例、字体颜色透明度及布局，最终实现词云与饼图拼接单张图片并按日期存档。期间还批量同步了多个order系列项目的代码。今日工作量大但偏重细节打磨，开发日志系统基本成型。
 
 ---
 
-<div align="center"><img src="wordcloud.png" width="49%%" style="vertical-align:middle" alt="提交词云"/> &nbsp; <img src="pie.svg" width="32.7%%" style="vertical-align:middle" alt="提交时间分布"/></div>
+<div align="center"><img src="wordcloud.png" width="49%" style="vertical-align:middle" alt="提交词云"/> &nbsp; <img src="pie.svg" width="32.7%" style="vertical-align:middle" alt="提交时间分布"/></div>
 
 📚 [查看历史日志](./logs/)

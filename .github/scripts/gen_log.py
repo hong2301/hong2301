@@ -204,8 +204,8 @@ def build_log(date_str, commits, ai_text, hexc):
     lines.append("---")
     lines.append("")
     lines.append('<div align="center">'
-                 '<img src="wordcloud.png" width="49%%" style="vertical-align:middle" alt="提交词云"/> &nbsp; '
-                 '<img src="pie.svg" width="32.7%%" style="vertical-align:middle" alt="提交时间分布"/>'
+                 '<img src="wordcloud.png" width="49%" style="vertical-align:middle" alt="提交词云"/> &nbsp; '
+                 '<img src="pie.svg" width="32.7%" style="vertical-align:middle" alt="提交时间分布"/>'
                  '</div>')
     lines.append("")
     lines.append("📚 [查看历史日志](./logs/)")
