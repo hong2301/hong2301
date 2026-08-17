@@ -214,14 +214,11 @@ def build_log(date_str, commits, ai_text, hexc):
     lines.append("")
     lines.append("---")
     lines.append("")
-    import base64 as _b64, os as _os
-    _root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-    _b64_wc = _b64.b64encode(open(_os.path.join(_root, "wordcloud.png"), "rb").read()).decode()
-    _b64_pie = _b64.b64encode(open(_os.path.join(_root, "pie.svg"), "rb").read()).decode()
+    v = date_str.replace("-", "")
     lines.append('<div align="center">'
-                 '<img src="data:image/png;base64,%s" width="49%%" style="vertical-align:middle" alt="提交词云"/> &nbsp; '
-                 '<img src="data:image/svg+xml;base64,%s" width="32.7%%" style="vertical-align:middle" alt="提交时间分布"/>'
-                 '</div>' % (_b64_wc, _b64_pie))
+                 '<img src="wordcloud.png?v=%s" width="49%%" style="vertical-align:middle" alt="提交词云"/> &nbsp; '
+                 '<img src="pie.svg?v=%s" width="32.7%%" style="vertical-align:middle" alt="提交时间分布"/>'
+                 '</div>' % (v, v))
     lines.append("")
     lines.append("📚 [查看历史日志](./logs/)")
     return chr(10).join(lines)
