@@ -203,10 +203,11 @@ def build_log(date_str, commits, ai_text, hexc):
     lines.append("")
     lines.append("---")
     lines.append("")
+    base = "https://cdn.jsdelivr.net/gh/hong2301/hong2301@main"
     lines.append('<div align="center">'
-                 '<img src="wordcloud.png?v=%s" width="49%%" style="vertical-align:middle" alt="提交词云"/> &nbsp; '
-                 '<img src="pie.svg?v=%s" width="32.7%%" style="vertical-align:middle" alt="提交时间分布"/>'
-                 '</div>' % (date_str, date_str))
+                 '<img src="%s/wordcloud.png" width="49%%" style="vertical-align:middle" alt="提交词云"/> &nbsp; '
+                 '<img src="%s/pie.svg" width="32.7%%" style="vertical-align:middle" alt="提交时间分布"/>'
+                 '</div>' % (base, base))
     lines.append("")
     lines.append("📚 [查看历史日志](./logs/)")
     return chr(10).join(lines)
