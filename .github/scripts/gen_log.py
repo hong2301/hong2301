@@ -195,14 +195,15 @@ if __name__ == "__main__":
     with open(os.path.join(root, "README.md"), "w", encoding="utf-8") as f:
         f.write(content)
     os.makedirs(os.path.join(root, "logs"), exist_ok=True)
+    day_dir = os.path.join(root, "logs", today)
+    os.makedirs(day_dir, exist_ok=True)
     if commits:
         import shutil
-        wc_a, pie_a = today + "-wordcloud.png", today + "-pie.svg"
-        shutil.copy(os.path.join(root, "wordcloud.png"), os.path.join(root, "logs", wc_a))
-        shutil.copy(os.path.join(root, "pie.svg"), os.path.join(root, "logs", pie_a))
-        img_arch = '<div align="center"><img src="%s" width="49%%" style="vertical-align:middle" alt="提交词云"/> &nbsp; <img src="%s" width="32.7%%" style="vertical-align:middle" alt="提交时间分布"/></div>' % (wc_a, pie_a)
+        shutil.copy(os.path.join(root, "wordcloud.png"), os.path.join(day_dir, "wordcloud.png"))
+        shutil.copy(os.path.join(root, "pie.svg"), os.path.join(day_dir, "pie.svg"))
+        img_arch = '<div align="center"><img src="wordcloud.png" width="49%%" style="vertical-align:middle" alt="提交词云"/> &nbsp; <img src="pie.svg" width="32.7%%" style="vertical-align:middle" alt="提交时间分布"/></div>'
     else:
         img_arch = img_now
-    with open(os.path.join(root, "logs", today + ".md"), "w", encoding="utf-8") as f:
+    with open(os.path.join(day_dir, "日志.md"), "w", encoding="utf-8") as f:
         f.write(build_log(today, commits, ai_text, hexc, img_arch))
     print("完成: %d commits, 主题色 %s" % (len(commits), color_name))
