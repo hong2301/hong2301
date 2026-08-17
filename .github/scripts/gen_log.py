@@ -121,22 +121,24 @@ def build_pie_svg(commits, hexc):
         hh = int(c["time"][:2])
         buckets[min(hh//4, 5)] = (buckets[min(hh//4,5)][0], buckets[min(hh//4,5)][1]+1)
     total = len(commits) or 1
-    W, H, cx, cy, r, r2 = 420, 350, 210, 175, 115, 64
+    W, H, cx, cy, rmax = 420, 350, 210, 175, 128
+    maxv = max(b[1] for b in buckets) or 1
     colors = shades(hexc, len(buckets))
     s = ['<svg xmlns="http://www.w3.org/2000/svg" width="%d" height="%d" viewBox="0 0 %d %d">' % (W,H,W,H),
          '<rect width="100%%" height="100%%" fill="#0d1117"/>']
-    start = -90
+    seg = 360.0 / len(buckets)
+    gap = 1.5
     for i, (name, v) in enumerate(buckets):
-        frac = v / total
-        a0, a1 = start, start + frac * 360
-        if frac > 0.001:
-            x0,y0 = _polar(cx,cy,r,a0); x1,y1 = _polar(cx,cy,r,a1)
-            x2,y2 = _polar(cx,cy,r2,a1); x3,y3 = _polar(cx,cy,r2,a0)
-            large = 1 if (a1-a0) > 180 else 0
-            d = ("M %.1f %.1f A %d %d 0 %d 1 %.1f %.1f L %.1f %.1f A %d %d 0 %d 0 %.1f %.1f Z"
-                 % (x0,y0,r,r,large,x1,y1,x2,y2,r2,r2,large,x3,y3))
+        rr = rmax * (v / maxv)
+        if rr > 2:
+            a0 = -90 + i * seg + gap / 2
+            a1 = -90 + (i + 1) * seg - gap / 2
+            x0, y0 = _polar(cx, cy, rr, a0)
+            x1, y1 = _polar(cx, cy, rr, a1)
+            large = 1 if (a1 - a0) > 180 else 0
+            d = ("M %.1f %.1f L %.1f %.1f A %.1f %.1f 0 %d 1 %.1f %.1f Z"
+                 % (cx, cy, x0, y0, rr, rr, large, x1, y1))
             s.append('<path d="' + d + '" fill="' + colors[i] + '"/>')
-        start = a1
     s.append('<text x="%d" y="%d" fill="#1a1a1a" font-size="34" font-weight="bold" text-anchor="middle" font-family="sans-serif">%d</text>'
              % (cx, cy+2, total))
     s.append('<text x="%d" y="%d" fill="#333333" font-size="16" text-anchor="middle" font-family="sans-serif">次提交</text>'
@@ -151,7 +153,7 @@ def build_log(date_str, commits, ai_text, hexc, img_line):
     title = '<h1 style="color:%s">%s日志</h1>' % (hexc, cn_date(date.fromisoformat(date_str)))
     lines = [title, "", ""]
     if ai_text:
-        lines.append("&nbsp;&nbsp;&nbsp;&nbsp;" + ai_text.strip())
+        lines.append("　　" + ai_text.strip())
     else:
         lines.append("*(今天没有提交记录)*" if not commits else "*日志生成中...*")
     lines.append("")
@@ -172,7 +174,7 @@ if __name__ == "__main__":
         except Exception as e:
             print("AI失败:", e)
     hexc = PALETTE.get(color_name, "#58a6ff")
-    img_now = '<img src="wordcloud.png" width="49%%" alt="提交词云"/> <img src="pie.svg" width="49%%" alt="提交时间分布"/>'
+    img_now = '<img src="wordcloud.png" width="49%%" alt="提交词云"/> <img src="pie.svg" width="32.7%%" alt="提交时间分布"/>'
     if commits:
         try:
             build_wordcloud(commits, os.path.join(root, "wordcloud.png"), hexc)
@@ -191,7 +193,7 @@ if __name__ == "__main__":
         wc_a, pie_a = today + "-wordcloud.png", today + "-pie.svg"
         shutil.copy(os.path.join(root, "wordcloud.png"), os.path.join(root, "logs", wc_a))
         shutil.copy(os.path.join(root, "pie.svg"), os.path.join(root, "logs", pie_a))
-        img_arch = '<img src="%s" width="49%%" alt="提交词云"/> <img src="%s" width="49%%" alt="提交时间分布"/>' % (wc_a, pie_a)
+        img_arch = '<img src="%s" width="49%%" alt="提交词云"/> <img src="%s" width="32.7%%" alt="提交时间分布"/>' % (wc_a, pie_a)
     else:
         img_arch = img_now
     with open(os.path.join(root, "logs", today + ".md"), "w", encoding="utf-8") as f:
