@@ -136,9 +136,11 @@ def _polar(cx, cy, r, deg):
 
 def build_pie_svg(commits, hexc, W=420, H=350):
     """饼图: SVG 矢量透明(环形 evenodd 挖空) + 12/3/6/9 时钟刻度 + 中心数字"""
+    # 用本地时间(北京 UTC+8)分桶, 避免出现未来时段
     buckets = [0, 0, 0, 0, 0, 0]
     for c in commits:
-        buckets[min(int(c["time"][:2]) // 4, 5)] += 1
+        bh = (int(c["time"][:2]) + 8) % 24
+        buckets[min(bh // 4, 5)] += 1
     total = len(commits) or 1
     cx, cy, r, r2 = W / 2, H / 2, H * 0.30, H * 0.155
     colors = shades(hexc, 6)
@@ -156,9 +158,10 @@ def build_pie_svg(commits, hexc, W=420, H=350):
             x2, y2 = _polar(cx, cy, r2, a1)
             x3, y3 = _polar(cx, cy, r2, a0)
             large = 1 if (a1 - a0) > 180 else 0
+            # 正确环形扇区: 外弧(顺) -> 内圆 -> 内弧(逆) -> 闭合
             d = ("M %.1f %.1f A %.1f %.1f 0 %d 1 %.1f %.1f "
-                 "A %.1f %.1f 0 %d 0 %.1f %.1f Z"
-                 % (x0, y0, r, r, large, x1, y1, r2, r2, large, x3, y3))
+                 "L %.1f %.1f A %.1f %.1f 0 %d 0 %.1f %.1f Z"
+                 % (x0, y0, r, r, large, x1, y1, x2, y2, r2, r2, large, x3, y3))
             all_d.append(d)
         start = a1
     if all_d:
