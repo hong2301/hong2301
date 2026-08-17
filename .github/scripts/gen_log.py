@@ -100,7 +100,7 @@ def build_wordcloud(commits, out, hexc):
         ll = max(0.3, min(0.85, l + (rv - 0.5) * 0.35))
         r, g, b = colorsys.hls_to_rgb(h, ll, max(0.4, min(0.75, s)))
         return int(r*255), int(g*255), int(b*255)
-    wc = WordCloud(font_path=FONT, width=420, height=420,
+    wc = WordCloud(font_path=FONT, width=630, height=420,
         background_color="white", color_func=cf,
         max_words=80, random_state=42, collocations=False).generate(seg)
     arr = np.array(wc.to_image())
@@ -137,9 +137,9 @@ def build_pie_svg(commits, hexc):
                  % (x0,y0,r,r,large,x1,y1,x2,y2,r2,r2,large,x3,y3))
             s.append('<path d="' + d + '" fill="' + colors[i] + '"/>')
         start = a1
-    s.append('<text x="%d" y="%d" fill="#e6edf3" font-size="36" font-weight="bold" text-anchor="middle" font-family="sans-serif">%d</text>'
+    s.append('<text x="%d" y="%d" fill="#1a1a1a" font-size="36" font-weight="bold" text-anchor="middle" font-family="sans-serif">%d</text>'
              % (cx, cy+2, total))
-    s.append('<text x="%d" y="%d" fill="#8b949e" font-size="18" text-anchor="middle" font-family="sans-serif">次提交</text>'
+    s.append('<text x="%d" y="%d" fill="#333333" font-size="18" text-anchor="middle" font-family="sans-serif">次提交</text>'
              % (cx, cy+32))
     s.append('</svg>')
     return "".join(s)
