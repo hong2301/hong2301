@@ -151,7 +151,7 @@ def build_log(date_str, commits, ai_text, hexc, img_line):
     title = '<h1 style="color:%s">%s日志</h1>' % (hexc, cn_date(date.fromisoformat(date_str)))
     lines = [title, "", ""]
     if ai_text:
-        lines.append(ai_text.strip())
+        lines.append("&nbsp;&nbsp;&nbsp;&nbsp;" + ai_text.strip())
     else:
         lines.append("*(今天没有提交记录)*" if not commits else "*日志生成中...*")
     lines.append("")
