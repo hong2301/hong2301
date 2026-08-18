@@ -29,7 +29,7 @@ def gh_api(url):
 
 
 def ds_ai(text, max_tokens=2000):
-    body = json.dumps({"model": "deepseek-v4-flash",
+    body = json.dumps({"model": "deepseek-chat",
         "messages": [{"role": "user", "content": text}],
         "stream": False, "max_tokens": max_tokens}).encode()
     req = urllib.request.Request("https://api.deepseek.com/chat/completions",
