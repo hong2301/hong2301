@@ -39,32 +39,50 @@ def ds_ai(text, max_tokens=2000):
         return json.load(r)["choices"][0]["message"]["content"]
 
 
-def bj_yesterday_utc_range():
-    """返回(昨天北京全天)的 (since_utc, until_utc)"""
+def bj_yesterday_dates():
+    """返回(昨天北京日期str, 昨天北京时间范围UTC)"""
     bj = timezone(timedelta(hours=8))
     now = datetime.now(bj)
-    y = (now - timedelta(days=1)).replace(hour=0, minute=0, second=0, microsecond=0)
-    since_utc = y.astimezone(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
-    until_utc = (y + timedelta(days=1)).astimezone(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
-    return since_utc, until_utc
+    y = (now - timedelta(days=1)).date()
+    # 北京昨天全天 = UTC (y-1天 16:00) 到 (y 16:00)
+    utc_start = datetime(y.year, y.month, y.day, 0, 0, 0, tzinfo=bj).astimezone(timezone.utc)
+    utc_end = (utc_start + timedelta(days=1))
+    return y.isoformat(), utc_start, utc_end
 
 
 def today_commits():
-    since, until = bj_yesterday_utc_range()
-    commits, page = [], 1
-    while True:
-        url = ("https://api.github.com/search/commits?q=author:" + AUTHOR +
-               "+committer-date:>=" + since + "+committer-date:<" + until +
-               "&per_page=100&page=" + str(page))
-        items = gh_api(url).get("items", [])
-        for it in items:
-            c = it["commit"]
-            commits.append({"time": (c.get("committer") or {}).get("date", "")[11:19],
+    """查昨天(北京)全天提交: GitHub committer-date 只支持精确日期, 拆两天查再过滤"""
+    date_str, utc_start, utc_end = bj_yesterday_dates()
+    # 查 UTC 两天的精确日期提交(覆盖北京昨天全天)
+    raw = []
+    for d in [utc_start.strftime("%Y-%m-%d"), utc_end.strftime("%Y-%m-%d")]:
+        page = 1
+        while True:
+            url = ("https://api.github.com/search/commits?q=author:" + AUTHOR +
+                   "+committer-date:" + d + "&per_page=100&page=" + str(page))
+            items = gh_api(url).get("items", [])
+            for it in items:
+                c = it["commit"]
+                raw.append(it)
+            if len(items) < 100 or page >= 10:
+                break
+            page += 1
+    # 过滤: 只保留北京时间昨天全天 (UTC start <= committer_date < UTC end)
+    commits = []
+    for it in raw:
+        c = it["commit"]
+        cd = (c.get("committer") or {}).get("date", "")
+        if not cd:
+            continue
+        # 解析为 datetime (兼容带时区后缀)
+        try:
+            cd_dt = datetime.fromisoformat(cd.replace("Z", "+00:00")).astimezone(timezone.utc)
+        except Exception:
+            continue
+        if utc_start <= cd_dt < utc_end:
+            commits.append({"time": cd[11:19],
                 "repo": ((it.get("repository") or {}).get("full_name", "")).replace("hong2301/", ""),
                 "msg": (c.get("message") or "").split(chr(10))[0]})
-        if len(items) < 100 or page >= 10:
-            break
-        page += 1
     commits.sort(key=lambda x: x["time"])
     return commits
 
