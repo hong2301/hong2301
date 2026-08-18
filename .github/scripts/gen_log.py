@@ -101,6 +101,7 @@ def ai_log_and_color(commits):
         "blue, green, purple, orange, cyan, pink, teal, yellow" + chr(10) +
         "严格只输出JSON: {\"text\": \"日志内容\", \"color\": \"颜色名\"}")
     raw = ds_ai(prompt)
+    print("AI原始返回:", repr(raw[:200]))
     m = re.search(r"\{.*\}", raw, re.S)
     if m:
         try:
