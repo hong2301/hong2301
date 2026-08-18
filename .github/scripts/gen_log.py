@@ -112,7 +112,7 @@ def ai_log_and_color(commits):
         except Exception:
             pass
     # fallback: JSON解析失败时用正则提取 text 字段
-    tm = re.search(r'"text"\s*:\s*"((?:[^"\]|\.)*)"', raw, re.S)
+    tm = re.search(r'"text"\s*:\s*"(.*?)"', raw, re.S)
     if tm:
         try:
             return json.loads('"' + tm.group(1) + '"'), "blue"
