@@ -14,11 +14,11 @@ jobs:
         with:
           python-version: "3.11"
           cache: 'pip'          # 缓存 PyPI 依赖, 避免每次重新下载
-      - name: 安装依赖(词云+中文分词)与中文字体
+      - name: 安装中文字体
         run: |
-          pip install -r requirements.txt   # wordcloud(含 matplotlib) + jieba
-          sudo apt-get update -qq
-          sudo apt-get install -y -qq fonts-wqy-microhei
+          sudo apt-get update -qq && sudo apt-get install -y -qq fonts-wqy-microhei
+      - name: 安装依赖(词云+中文分词)
+        run: pip install -r requirements.txt   # wordcloud(含 matplotlib) + jieba
       - name: 生成每日开发日志(AI总结+词云+时间饼图+存档)
         run: python .github/scripts/gen_log.py
         env:
