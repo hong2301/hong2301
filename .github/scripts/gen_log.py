@@ -222,8 +222,21 @@ def build_pie_svg(commits, hexc, W=350, H=350):
             all_d.append((d, c))
         start = a1
     if all_d:
-        s.append('<g>' + "".join(
-            '<path d="%s" fill="%s"/>' % (d, c) for d, c in all_d) + '</g>')
+        # 先画完整圆环轮廓(主题色描边, 空时段也能看到圆环边界)
+        top_x, top_y = _polar(cx, cy, r, -90)
+        bot_x, bot_y = _polar(cx, cy, r, 90)
+        itop_x, itop_y = _polar(cx, cy, r2, -90)
+        ibot_x, ibot_y = _polar(cx, cy, r2, 90)
+        ring = ("M %.1f %.1f A %.1f %.1f 0 1 1 %.1f %.1f A %.1f %.1f 0 1 1 %.1f %.1f "
+                "L %.1f %.1f A %.1f %.1f 0 1 0 %.1f %.1f A %.1f %.1f 0 1 0 %.1f %.1f Z"
+                % (top_x, top_y, r, r, bot_x, bot_y, r, r, top_x, top_y,
+                   itop_x, itop_y, r2, r2, ibot_x, ibot_y, r2, r2, itop_x, itop_y))
+        s.append('<path d="%s" fill="none" stroke="%s" stroke-width="2" stroke-opacity="0.7"/>'
+                 % (ring, hexc))
+        # 扇区
+        s.append('<g>%s</g>' % "".join(
+            '<path d="%s" fill="%s" stroke="%s" stroke-width="1"/>' % (d, c, hexc)
+            for d, c in all_d))
     # 24小时制刻度: 上24 右6 下12 左18
     for ang, label in ((-90, "24"), (0, "6"), (90, "12"), (180, "18")):
         lx, ly = _polar(cx, cy, r + H * 0.06, ang)
@@ -256,10 +269,10 @@ def build_log(date_str, commits, ai_text, hexc):
         lines.append("*(今天没有提交记录)*" if not commits else "*日志生成中...*")
     lines.append("")
     v = date_str.replace("-", "")
-    lines.append('<div align="center">'
-                 '<img src="wordcloud.png?v=%s" width="64%%" style="vertical-align:middle" alt="提交词云"/> '
-                 '<img src="pie.svg?v=%s" width="36%%" style="vertical-align:middle" alt="提交时间分布"/>'
-                 '</div>' % (v, v))
+    lines.append('<table align="center"><tr><td>'
+                 '<img src="wordcloud.png?v=%s" width="630" alt="提交词云"/></td><td>'
+                 '<img src="pie.svg?v=%s" width="350" alt="提交时间分布"/></td></tr></table>'
+                 % (v, v))
     lines.append("")
     lines.append("📚 [查看历史日志](./logs/)")
     return chr(10).join(lines)
