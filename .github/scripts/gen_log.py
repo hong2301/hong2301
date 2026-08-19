@@ -222,9 +222,12 @@ def build_pie_svg(commits, hexc, W=350, H=350):
             all_d.append((d, c))
         start = a1
     if all_d:
-        # 只画外圆轮廓(主题色): 空时段也能看到外圈边界
+        # 外圆轮廓(主题色)
         s.append('<circle cx="%.1f" cy="%.1f" r="%.1f" fill="none" stroke="%s" '
                  'stroke-width="3" stroke-opacity="0.7"/>' % (cx, cy, r, hexc))
+        # 内圆轮廓(主题色, 比外框细一倍, 透明度80%)
+        s.append('<circle cx="%.1f" cy="%.1f" r="%.1f" fill="none" stroke="%s" '
+                 'stroke-width="1.5" stroke-opacity="0.8"/>' % (cx, cy, r2, hexc))
         # 扇区(无任何描边)
         s.append('<g>%s</g>' % "".join(
             '<path d="%s" fill="%s"/>' % (d, c)
