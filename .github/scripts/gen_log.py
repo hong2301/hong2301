@@ -81,6 +81,7 @@ def today_commits():
             continue
         if utc_start <= cd_dt < utc_end:
             commits.append({"time": cd[11:19],
+                "_date": cd,
                 "repo": ((it.get("repository") or {}).get("full_name", "")).replace("hong2301/", ""),
                 "msg": (c.get("message") or "").split(chr(10))[0]})
     commits.sort(key=lambda x: x["time"])
@@ -181,10 +182,15 @@ def _polar(cx, cy, r, deg):
 
 def build_pie_svg(commits, hexc, W=350, H=350):
     """饼图: SVG 矢量透明(环形 evenodd 挖空) + 12/3/6/9 时钟刻度 + 中心数字"""
-    # 用本地时间(北京 UTC+8)分桶, 避免出现未来时段
+    # 用北京时间分桶: committer.date 可能带 +08:00(已是北京)或 Z(UTC需+8)
+    bj = timezone(timedelta(hours=8))
     buckets = [0, 0, 0, 0, 0, 0]
     for c in commits:
-        bh = (int(c["time"][:2]) + 8) % 24
+        try:
+            cd_dt = datetime.fromisoformat(c["_date"].replace("Z", "+00:00")).astimezone(bj)
+            bh = cd_dt.hour
+        except Exception:
+            bh = (int(c["time"][:2]) + 8) % 24   # fallback: 假设 time 是 UTC
         buckets[min(bh // 4, 5)] += 1
     total = len(commits) or 1
     cx, cy, r, r2 = W / 2, H / 2, H * 0.42, H * 0.22
@@ -210,11 +216,9 @@ def build_pie_svg(commits, hexc, W=350, H=350):
             all_d.append(d)
         start = a1
     if all_d:
-        s.append('<path d="%s" fill-rule="evenodd" fill="%s" fill-opacity="%s"/>'
-                 % (" ".join(all_d), "#555555", "0.0") if False else
-                 ('<g>' + "".join(
-                     '<path d="%s" fill="%s"/>' % (d, colors[i])
-                     for i, d in enumerate(all_d) if buckets[i] > 0) + '</g>'))
+        s.append('<g>' + "".join(
+            '<path d="%s" fill="%s"/>' % (d, colors[i])
+            for i, d in enumerate(all_d)) + '</g>')
     # 文字直接用主题色
     for ang, label in ((-90, "12"), (0, "3"), (90, "6"), (180, "9")):
         lx, ly = _polar(cx, cy, r + H * 0.06, ang)
