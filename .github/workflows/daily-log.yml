@@ -22,7 +22,7 @@ jobs:
       - name: 生成每日开发日志(AI总结+词云+时间饼图+存档)
         run: python .github/scripts/gen_log.py
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}          # 用PAT搜索用户所有仓库提交
           DEEPSEEK_TOKEN: ${{ secrets.DEEPSEEK_TOKEN }}
           FONT_PATH: /usr/share/fonts/truetype/wqy/wqy-microhei.ttc
       - name: 提交日志
