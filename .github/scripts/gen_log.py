@@ -181,46 +181,52 @@ def _polar(cx, cy, r, deg):
 
 
 def build_pie_svg(commits, hexc, W=350, H=350):
-    """饼图: SVG 矢量透明(环形 evenodd 挖空) + 12/3/6/9 时钟刻度 + 中心数字"""
-    # 用北京时间分桶: committer.date 可能带 +08:00(已是北京)或 Z(UTC需+8)
+    """饼图: SVG 矢量透明环形图 + 24小时制(24/6/12/18刻度) + 每2小时1扇区 + 颜色深浅按数量"""
+    # 用北京时间分桶: 每2小时一个时段, 共12桶
     bj = timezone(timedelta(hours=8))
-    buckets = [0, 0, 0, 0, 0, 0]
+    N = 12
+    buckets = [0] * N
     for c in commits:
         try:
             cd_dt = datetime.fromisoformat(c["_date"].replace("Z", "+00:00")).astimezone(bj)
             bh = cd_dt.hour
         except Exception:
             bh = (int(c["time"][:2]) + 8) % 24   # fallback: 假设 time 是 UTC
-        buckets[min(bh // 4, 5)] += 1
+        buckets[min(bh // 2, N - 1)] += 1
     total = len(commits) or 1
     cx, cy, r, r2 = W / 2, H / 2, H * 0.42, H * 0.22
-    colors = shades(hexc, 6)
     s = ['<svg xmlns="http://www.w3.org/2000/svg" width="%d" height="%d" viewBox="0 0 %d %d">'
          % (W, H, W, H)]
-    # 环形扇区(evenodd 挖空内圆) - 用单个复合path
+    # 颜色深浅: 按提交数比例, 最多=最深(主题色), 为0=不画
+    import colorsys
+    hh, ll, ss = colorsys.rgb_to_hls(*(int(hexc[i:i+2], 16) / 255 for i in (1, 3, 5)))
+    mx = max(buckets) or 1
     all_d = []
     start = -90
     for i, v in enumerate(buckets):
         frac = v / total
         a0, a1 = start, start + frac * 360
-        if frac > 0.001:
+        if v > 0:
             x0, y0 = _polar(cx, cy, r, a0)
             x1, y1 = _polar(cx, cy, r, a1)
             x2, y2 = _polar(cx, cy, r2, a1)
             x3, y3 = _polar(cx, cy, r2, a0)
             large = 1 if (a1 - a0) > 180 else 0
-            # 正确环形扇区: 外弧(顺) -> 内圆 -> 内弧(逆) -> 闭合
             d = ("M %.1f %.1f A %.1f %.1f 0 %d 1 %.1f %.1f "
                  "L %.1f %.1f A %.1f %.1f 0 %d 0 %.1f %.1f Z"
                  % (x0, y0, r, r, large, x1, y1, x2, y2, r2, r2, large, x3, y3))
-            all_d.append(d)
+            # 深浅: 0->最浅(接近白), 1->主题色最亮
+            t = v / mx
+            lv = 0.55 + 0.40 * t   # 浅(0.55) 到 深(0.15以下更鲜艳)
+            rgb = colorsys.hls_to_rgb(hh, max(0.12, 1.0 - 0.9 * t), ss)
+            c = "#%02x%02x%02x" % tuple(int(ch * 255) for ch in rgb)
+            all_d.append((d, c))
         start = a1
     if all_d:
         s.append('<g>' + "".join(
-            '<path d="%s" fill="%s"/>' % (d, colors[i])
-            for i, d in enumerate(all_d)) + '</g>')
-    # 文字直接用主题色
-    for ang, label in ((-90, "12"), (0, "3"), (90, "6"), (180, "9")):
+            '<path d="%s" fill="%s"/>' % (d, c) for d, c in all_d) + '</g>')
+    # 24小时制刻度: 上24 右6 下12 左18
+    for ang, label in ((-90, "24"), (0, "6"), (90, "12"), (180, "18")):
         lx, ly = _polar(cx, cy, r + H * 0.06, ang)
         s.append('<text x="%.1f" y="%.1f" fill="%s" font-size="17" font-weight="bold" '
                  'text-anchor="middle" font-family="sans-serif">%s</text>'
