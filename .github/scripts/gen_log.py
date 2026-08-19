@@ -246,8 +246,6 @@ def build_log(date_str, commits, ai_text, hexc):
     else:
         lines.append("*(今天没有提交记录)*" if not commits else "*日志生成中...*")
     lines.append("")
-    lines.append("---")
-    lines.append("")
     v = date_str.replace("-", "")
     lines.append('<div align="center">'
                  '<img src="wordcloud.png?v=%s" width="64%%" style="vertical-align:middle" alt="提交词云"/> '
