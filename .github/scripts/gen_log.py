@@ -231,11 +231,11 @@ def build_pie_svg(commits, hexc, W=350, H=350):
                 "L %.1f %.1f A %.1f %.1f 0 1 0 %.1f %.1f A %.1f %.1f 0 1 0 %.1f %.1f Z"
                 % (top_x, top_y, r, r, bot_x, bot_y, r, r, top_x, top_y,
                    itop_x, itop_y, r2, r2, ibot_x, ibot_y, r2, r2, itop_x, itop_y))
-        s.append('<path d="%s" fill="none" stroke="%s" stroke-width="2" stroke-opacity="0.7"/>'
+        s.append('<path d="%s" fill="none" stroke="%s" stroke-width="3" stroke-opacity="0.7"/>'
                  % (ring, hexc))
         # 扇区
         s.append('<g>%s</g>' % "".join(
-            '<path d="%s" fill="%s" stroke="%s" stroke-width="1"/>' % (d, c, hexc)
+            '<path d="%s" fill="%s" stroke="%s" stroke-width="1.5"/>' % (d, c, hexc)
             for d, c in all_d))
     # 24小时制刻度: 上24 右6 下12 左18
     for ang, label in ((-90, "24"), (0, "6"), (90, "12"), (180, "18")):
