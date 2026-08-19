@@ -5,6 +5,6 @@
 
 ---
 
-<div align="center"><img src="wordcloud.png?v=20260819" width="49%" style="vertical-align:middle" alt="提交词云"/> &nbsp; <img src="pie.svg?v=20260819" width="32.7%" style="vertical-align:middle" alt="提交时间分布"/></div>
+<div align="center"><img src="wordcloud.png?v=20260819" width="64%" style="vertical-align:middle" alt="提交词云"/> <img src="pie.svg?v=20260819" width="36%" style="vertical-align:middle" alt="提交时间分布"/></div>
 
 📚 [查看历史日志](./logs/)
