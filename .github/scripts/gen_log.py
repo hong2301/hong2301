@@ -179,7 +179,7 @@ def _polar(cx, cy, r, deg):
     return cx + r * math.cos(rad), cy + r * math.sin(rad)
 
 
-def build_pie_svg(commits, hexc, W=420, H=350):
+def build_pie_svg(commits, hexc, W=350, H=350):
     """饼图: SVG 矢量透明(环形 evenodd 挖空) + 12/3/6/9 时钟刻度 + 中心数字"""
     # 用本地时间(北京 UTC+8)分桶, 避免出现未来时段
     buckets = [0, 0, 0, 0, 0, 0]
@@ -250,8 +250,8 @@ def build_log(date_str, commits, ai_text, hexc):
     lines.append("")
     v = date_str.replace("-", "")
     lines.append('<div align="center">'
-                 '<img src="wordcloud.png?v=%s" width="58%%" style="vertical-align:middle" alt="提交词云"/> '
-                 '<img src="pie.svg?v=%s" width="42%%" style="vertical-align:middle" alt="提交时间分布"/>'
+                 '<img src="wordcloud.png?v=%s" width="64%%" style="vertical-align:middle" alt="提交词云"/> '
+                 '<img src="pie.svg?v=%s" width="36%%" style="vertical-align:middle" alt="提交时间分布"/>'
                  '</div>' % (v, v))
     lines.append("")
     lines.append("📚 [查看历史日志](./logs/)")
