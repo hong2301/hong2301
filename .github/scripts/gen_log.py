@@ -201,11 +201,11 @@ def build_pie_svg(commits, hexc, W=350, H=350):
     import colorsys
     hh, ll, ss = colorsys.rgb_to_hls(*(int(hexc[i:i+2], 16) / 255 for i in (1, 3, 5)))
     mx = max(buckets) or 1
+    seg = 360.0 / N          # 每个时段固定角度(30°), 保证空时段留白
     all_d = []
     start = -90
     for i, v in enumerate(buckets):
-        frac = v / total
-        a0, a1 = start, start + frac * 360
+        a0, a1 = start, start + seg
         if v > 0:
             x0, y0 = _polar(cx, cy, r, a0)
             x1, y1 = _polar(cx, cy, r, a1)
@@ -215,9 +215,8 @@ def build_pie_svg(commits, hexc, W=350, H=350):
             d = ("M %.1f %.1f A %.1f %.1f 0 %d 1 %.1f %.1f "
                  "L %.1f %.1f A %.1f %.1f 0 %d 0 %.1f %.1f Z"
                  % (x0, y0, r, r, large, x1, y1, x2, y2, r2, r2, large, x3, y3))
-            # 深浅: 0->最浅(接近白), 1->主题色最亮
+            # 深浅: 数量越多越深, 越少越浅
             t = v / mx
-            lv = 0.55 + 0.40 * t   # 浅(0.55) 到 深(0.15以下更鲜艳)
             rgb = colorsys.hls_to_rgb(hh, max(0.12, 1.0 - 0.9 * t), ss)
             c = "#%02x%02x%02x" % tuple(int(ch * 255) for ch in rgb)
             all_d.append((d, c))
