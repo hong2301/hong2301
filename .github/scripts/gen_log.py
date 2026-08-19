@@ -233,9 +233,9 @@ def build_pie_svg(commits, hexc, W=350, H=350):
                    itop_x, itop_y, r2, r2, ibot_x, ibot_y, r2, r2, itop_x, itop_y))
         s.append('<path d="%s" fill="none" stroke="%s" stroke-width="3" stroke-opacity="0.7"/>'
                  % (ring, hexc))
-        # 扇区
+        # 扇区(无描边, 仅外环有轮廓线)
         s.append('<g>%s</g>' % "".join(
-            '<path d="%s" fill="%s" stroke="%s" stroke-width="1.5"/>' % (d, c, hexc)
+            '<path d="%s" fill="%s"/>' % (d, c)
             for d, c in all_d))
     # 24小时制刻度: 上24 右6 下12 左18
     for ang, label in ((-90, "24"), (0, "6"), (90, "12"), (180, "18")):
