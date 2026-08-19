@@ -187,7 +187,7 @@ def build_pie_svg(commits, hexc, W=420, H=350):
         bh = (int(c["time"][:2]) + 8) % 24
         buckets[min(bh // 4, 5)] += 1
     total = len(commits) or 1
-    cx, cy, r, r2 = W / 2, H / 2, H * 0.30, H * 0.155
+    cx, cy, r, r2 = W / 2, H / 2, H * 0.42, H * 0.22
     colors = shades(hexc, 6)
     s = ['<svg xmlns="http://www.w3.org/2000/svg" width="%d" height="%d" viewBox="0 0 %d %d">'
          % (W, H, W, H)]
