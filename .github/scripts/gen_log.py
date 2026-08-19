@@ -222,18 +222,10 @@ def build_pie_svg(commits, hexc, W=350, H=350):
             all_d.append((d, c))
         start = a1
     if all_d:
-        # 先画完整圆环轮廓(主题色描边, 空时段也能看到圆环边界)
-        top_x, top_y = _polar(cx, cy, r, -90)
-        bot_x, bot_y = _polar(cx, cy, r, 90)
-        itop_x, itop_y = _polar(cx, cy, r2, -90)
-        ibot_x, ibot_y = _polar(cx, cy, r2, 90)
-        ring = ("M %.1f %.1f A %.1f %.1f 0 1 1 %.1f %.1f A %.1f %.1f 0 1 1 %.1f %.1f "
-                "L %.1f %.1f A %.1f %.1f 0 1 0 %.1f %.1f A %.1f %.1f 0 1 0 %.1f %.1f Z"
-                % (top_x, top_y, r, r, bot_x, bot_y, r, r, top_x, top_y,
-                   itop_x, itop_y, r2, r2, ibot_x, ibot_y, r2, r2, itop_x, itop_y))
-        s.append('<path d="%s" fill="none" stroke="%s" stroke-width="3" stroke-opacity="0.7"/>'
-                 % (ring, hexc))
-        # 扇区(无描边, 仅外环有轮廓线)
+        # 只画外圆轮廓(主题色): 空时段也能看到外圈边界
+        s.append('<circle cx="%.1f" cy="%.1f" r="%.1f" fill="none" stroke="%s" '
+                 'stroke-width="3" stroke-opacity="0.7"/>' % (cx, cy, r, hexc))
+        # 扇区(无任何描边)
         s.append('<g>%s</g>' % "".join(
             '<path d="%s" fill="%s"/>' % (d, c)
             for d, c in all_d))
