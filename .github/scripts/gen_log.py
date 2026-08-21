@@ -1,5 +1,6 @@
 # 每日开发日志v6: 词云PIL透明 + 饼图SVG矢量透明 + 12/3/6/9刻度 + AI 30-500字
 import json, math, os, re, urllib.request, colorsys
+from urllib.parse import quote as _urlquote
 from datetime import date, datetime, timezone, timedelta
 
 GH_TOKEN = os.environ.get("GH_TOKEN", "")
@@ -51,39 +52,80 @@ def bj_yesterday_dates():
 
 
 def today_commits():
-    """查昨天(北京)全天提交: GitHub committer-date 只支持精确日期, 拆两天查再过滤"""
+    """查昨天(北京)全天提交: 遍历所有仓库所有分支(Repo Commits API), 避免漏掉非默认分支
+    因为 GitHub Search Commits API 只搜默认分支, 会漏掉 feature/业务分支的提交"""
     date_str, utc_start, utc_end = bj_yesterday_dates()
-    # 查 UTC 两天的精确日期提交(覆盖北京昨天全天)
-    raw = []
-    for d in [utc_start.strftime("%Y-%m-%d"), utc_end.strftime("%Y-%m-%d")]:
-        page = 1
-        while True:
-            url = ("https://api.github.com/search/commits?q=author:" + AUTHOR +
-                   "+committer-date:" + d + "&per_page=100&page=" + str(page))
-            items = gh_api(url).get("items", [])
-            for it in items:
-                c = it["commit"]
-                raw.append(it)
-            if len(items) < 100 or page >= 10:
-                break
-            page += 1
-    # 过滤: 只保留北京时间昨天全天 (UTC start <= committer_date < UTC end)
-    commits = []
-    for it in raw:
-        c = it["commit"]
-        cd = (c.get("committer") or {}).get("date", "")
-        if not cd:
+    since = utc_start.strftime("%Y-%m-%dT%H:%M:%SZ")
+    until = utc_end.strftime("%Y-%m-%dT%H:%M:%SZ")
+    # 取用户所有仓库(含私有): 必须用 /user/repos 并分页, /users/{name}/repos 只返回公开仓库
+    repos = []
+    page = 1
+    while True:
+        _r = gh_api("https://api.github.com/user/repos?per_page=100&page=" + str(page) + "&type=all")
+        repos.extend(_r if isinstance(_r, list) else [])
+        if len(_r) < 100:
+            break
+        page += 1
+    # 只保留近段有 push 的仓库, 大幅减少 API 调用
+    _active = []
+    for r in repos:
+        if not isinstance(r, dict):
             continue
-        # 解析为 datetime (兼容带时区后缀)
+        pushed = r.get("pushed_at", "")
         try:
-            cd_dt = datetime.fromisoformat(cd.replace("Z", "+00:00")).astimezone(timezone.utc)
+            pdt = datetime.fromisoformat(pushed.replace("Z", "+00:00")).astimezone(timezone.utc)
+            if pdt >= utc_start - timedelta(days=3):   # 最近3天有push才深入遍历
+                _active.append(r)
+        except Exception:
+            _active.append(r)
+    repos = _active
+    commits, seen = [], set()
+    for r in repos:
+        if not isinstance(r, dict):
+            continue
+        repo = r.get("name", "")
+        if not repo:
+            continue
+        try:
+            branches = gh_api("https://api.github.com/repos/" + AUTHOR + "/" + repo + "/branches?per_page=100")
         except Exception:
             continue
-        if utc_start <= cd_dt < utc_end:
-            commits.append({"time": cd[11:19],
-                "_date": cd,
-                "repo": ((it.get("repository") or {}).get("full_name", "")).replace("hong2301/", ""),
-                "msg": (c.get("message") or "").split(chr(10))[0]})
+        for br in branches:
+            if not isinstance(br, dict):
+                continue
+            branch = br.get("name", "")
+            if not branch:
+                continue
+            page = 1
+            while True:
+                url = ("https://api.github.com/repos/" + AUTHOR + "/" + repo +
+                       "/commits?sha=" + _urlquote(branch) + "&since=" + since + "&until=" + until +
+                       "&per_page=100&page=" + str(page))
+                try:
+                    items = gh_api(url)
+                except Exception:
+                    items = []
+                if not items:
+                    break
+                for it in items:
+                    if not isinstance(it, dict):
+                        continue
+                    c = it.get("commit") or {}
+                    cd = (c.get("committer") or {}).get("date", "")
+                    if not cd:
+                        continue
+                    try:
+                        cd_dt = datetime.fromisoformat(cd.replace("Z", "+00:00")).astimezone(timezone.utc)
+                    except Exception:
+                        continue
+                    if utc_start <= cd_dt < utc_end and it.get("sha") not in seen:
+                        seen.add(it.get("sha"))
+                        commits.append({"time": cd[11:19],
+                            "_date": cd, "repo": repo,
+                            "msg": (c.get("message") or "").split(chr(10))[0]})
+                if len(items) < 100:
+                    break
+                page += 1
     commits.sort(key=lambda x: x["time"])
     return commits
 
