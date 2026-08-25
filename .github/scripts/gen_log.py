@@ -1,5 +1,5 @@
 # 每日开发日志v6: 词云PIL透明 + 饼图SVG矢量透明 + 12/3/6/9刻度 + AI 30-500字
-import json, math, os, re, urllib.request, colorsys
+import json, math, os, re, random, urllib.request, colorsys
 from urllib.parse import quote as _urlquote
 from datetime import date, datetime, timezone, timedelta
 
@@ -132,6 +132,16 @@ def today_commits():
 
 def ai_log_and_color(commits):
     desc = chr(10).join("- " + c["time"] + " [" + REPO_NAMES.get(c["repo"], c["repo"]) + "] " + c["msg"] for c in commits)
+    # 打乱候选色顺序, 避免 AI 对固定顺序产生选色偏见(总选 blue)
+    _colors = ["blue", "green", "purple", "orange", "cyan", "pink", "teal", "yellow"]
+    random.shuffle(_colors)
+    color_desc = {
+        "blue": "蓝(沉稳/理性/科技)", "green": "绿(清新/成长/效率)",
+        "purple": "紫(创意/深度/思考)", "orange": "橙(活力/成果/收获)",
+        "cyan": "青(清爽/流畅/专注)", "pink": "粉(温柔/细致/耐心)",
+        "teal": "青绿(稳健/专业/平衡)", "yellow": "黄(亮眼/轻松/快速)",
+    }
+    color_list = chr(10).join("- " + c + ": " + color_desc[c] for c in _colors)
     prompt = (
         "以下是我今天(GitHub: hong2301)的全部代码提交记录(共%d条):" % len(commits) + chr(10) + desc +
         chr(10) + chr(10) + "请完成两件事:" + chr(10) +
@@ -140,9 +150,9 @@ def ai_log_and_color(commits):
         "重要: 涉及具体项目/版本号/功能时, 前面必须带项目中文名. "
         "严禁: 对未来的任何推测或期望(如'明天要...'、'明天应该...'、'接下来得...'), "
         "严禁情绪宣泄, 只描述事实与当天评价" + chr(10) +
-        "2. 根据今天的工作内容与状态, 从以下8个主题色中选一个最贴合的颜色:" + chr(10) +
-        "blue, green, purple, orange, cyan, pink, teal, yellow" + chr(10) +
-        "严格只输出JSON: {\"text\": \"日志内容\", \"color\": \"颜色名\"}")
+        "2. 根据今天的工作内容与状态, 从以下8个主题色中选一个最贴合当天气质的颜色:" + chr(10) +
+        color_list + chr(10) +
+        "严格只输出JSON: {\"text\": \"日志内容\", \"color\": \"颜色英文名(blue/green/purple/orange/cyan/pink/teal/yellow)\"}")
     raw = ds_ai(prompt)
     print("AI原始返回:", repr(raw[:500]))
     m = re.search(r"\{.*\}", raw, re.S)
