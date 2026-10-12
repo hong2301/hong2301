@@ -1,8 +1,8 @@
-<h1 style="color:#bc8cff">2026年10月11日日志</h1>
+<h1 style="color:#4ec9b0">2026年10月12日日志</h1>
 
 
-　　今天在订单AI剧本工作室项目上集中推进长剧本模式。上午先做了剧本库与视频库按 kind 隔离，长剧本只存储不解析；下午完成详细分镜、分段生成与拼接；同时把深浅色和剧本形态偏好改到 cookie，修掉了 hydration mismatch 与闪烁问题。傍晚长剧本改为按分镜粒度生成，并实现首尾帧串行链，人物库也加上了音色参考音频，支持多段上传、命名并在生成时注入。最后把版本从 1.3.2 升到 1.4.0，收尾提交了开发日志。今天节奏紧凑，功能点密集且互相关联，长剧本从存储、分镜到生成链路基本打通，整体推进扎实。
+　　今天在 order-ai-drama-studio 项目上更新了项目索引文档，补充了长剧本模式、run_id 和音色参考三块内容，属于文档整理性质的提交。晚上提交了一条每日开发日志记录。整体来说今天投入不多，主要是在梳理项目文档结构，让后续查阅更清晰。
 
-<table align="center"><tr><td><img src="wordcloud.png?v=20261011" width="630" alt="提交词云"/></td><td><img src="pie.svg?v=20261011" width="350" alt="提交时间分布"/></td></tr></table>
+<table align="center"><tr><td><img src="wordcloud.png?v=20261012" width="630" alt="提交词云"/></td><td><img src="pie.svg?v=20261012" width="350" alt="提交时间分布"/></td></tr></table>
 
 📚 [查看历史日志](./logs/)
