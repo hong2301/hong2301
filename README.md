@@ -1,8 +1,8 @@
-<h1 style="color:#4ec9b0">2026年10月12日日志</h1>
+<h1 style="color:#4ec9b0">2026年10月13日日志</h1>
 
 
-　　今天在 order-ai-drama-studio 项目上更新了项目索引文档，补充了长剧本模式、run_id 和音色参考三块内容，属于文档整理性质的提交。晚上提交了一条每日开发日志记录。整体来说今天投入不多，主要是在梳理项目文档结构，让后续查阅更清晰。
+　　今天主要在处理网站复刻相关的提交。上午先上传了一版基础文件，随后更新了网站复刻.zip的相对路径版，接着又上传了一次文件。中午对仓库做了一次清理操作。下午上传了网站复刻.zip的白黑主题版，主要工作是围绕主题样式做调整。晚上提交了每日开发日志。整体节奏集中在网站复刻的迭代上，从路径修正到主题切换都有涉及，提交频次较高，任务推进较为连贯。
 
-<table align="center"><tr><td><img src="wordcloud.png?v=20261012" width="630" alt="提交词云"/></td><td><img src="pie.svg?v=20261012" width="350" alt="提交时间分布"/></td></tr></table>
+<table align="center"><tr><td><img src="wordcloud.png?v=20261013" width="630" alt="提交词云"/></td><td><img src="pie.svg?v=20261013" width="350" alt="提交时间分布"/></td></tr></table>
 
 📚 [查看历史日志](./logs/)
