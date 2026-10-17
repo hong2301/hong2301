@@ -1,8 +1,8 @@
-<h1 style="color:#4ec9b0">2026年10月16日日志</h1>
+<h1 style="color:#4ec9b0">2026年10月17日日志</h1>
 
 
-　　今天主要完成了三块工作。一是共享上传项目：凌晨上传了日期目录文件，并新增了梅西正脸图片样本；下午上传了「网站复刻.zip」，修复了蓝色按钮 hover 时文字不可见的问题。二是小红书采集项目：补充了后端缺失的 sqlalchemy 与 openpyxl 依赖声明，并新增了待优化项文档。三是提交了每日开发日志。整体节奏较平稳，上午偏素材整理，下午集中在两个项目的修复与文档补全，问题定位明确，改动都不大，属于日常维护推进的一天。
+　　今天在 educoder-quest-king 项目上修正了登录判定逻辑，明确区分游客与已登录状态，并调整 isLogin 不再触发导航行为。随后提交了每日开发日志。整体工作量较小，集中在一个判定条件的修复上，属于细节完善型的一天。
 
-<table align="center"><tr><td><img src="wordcloud.png?v=20261016" width="630" alt="提交词云"/></td><td><img src="pie.svg?v=20261016" width="350" alt="提交时间分布"/></td></tr></table>
+<table align="center"><tr><td><img src="wordcloud.png?v=20261017" width="630" alt="提交词云"/></td><td><img src="pie.svg?v=20261017" width="350" alt="提交时间分布"/></td></tr></table>
 
 📚 [查看历史日志](./logs/)
