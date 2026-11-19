@@ -1,8 +1,8 @@
-<h1 style="color:#58a6ff">2026年11月18日日志</h1>
+<h1 style="color:#d29922">2026年11月19日日志</h1>
 
 
-　　今天主要围绕远程接入工具展开。上午为外交官项目做了远程接入部署包；下午把该项目重新实现为 remote-pi daemon 跨平台部署工具，随后对齐 settings.packages 配置并修复 Windows 命名管道检测问题，又加固了 Windows 崩溃自愈能力，加入保活启动器，并把默认路径从 workspace/仓库/daemon 调整为 workspace/repo/daemon。傍晚同步了 educoder-quest-king 项目的文档至 v1.8.0 并修正过时描述，深夜提交了每日开发日志。整体节奏集中在下午，以跨平台兼容和稳定性修补为主，工作量较充实。
+　　今天主要推进了闲鱼控制器的自动化能力。上午完成实时监控与 AI 自动回复的双线程拆分，加入看图、按历史对话重写话术、二次确认防重复回复、监控页闲置归位通知消息等细节修复；模型切到 glm-4-flash，价格策略收敛为只报一关一块，并引入角色文件、忽略词、订单消息过滤和特殊会话白名单。晚上补齐卖家工作台 IM 数据提取、消息关联订单、待发货待办清单（自动提取账号密码）、文字/图片/视频/文件发送、待发货批量回复、派单文件生成，open_conversation 增加点击后校验。另外微信视频采集器优化了热点扫描与解密 key 获取，并发下载；B 站音频采集器新建成型并绕开代理与 FAT32 坑。全天节奏紧凑，从对话自动化延伸到订单履约闭环，落地感强。
 
-<table align="center"><tr><td><img src="wordcloud.png?v=20261118" width="630" alt="提交词云"/></td><td><img src="pie.svg?v=20261118" width="350" alt="提交时间分布"/></td></tr></table>
+<table align="center"><tr><td><img src="wordcloud.png?v=20261119" width="630" alt="提交词云"/></td><td><img src="pie.svg?v=20261119" width="350" alt="提交时间分布"/></td></tr></table>
 
 📚 [查看历史日志](./logs/)
